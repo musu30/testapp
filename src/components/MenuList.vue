@@ -1,89 +1,100 @@
 <template >
-  <section>
+  <section style="padding: 0px">
     <div v-if="loading" class="loading">Loading&#8230;</div>
 
-    <div class="row">
-      <div class="col-lg-12">
-        <div style="float: left">
-          <label><i class="fas fa-arrow-left"></i>{{ resturentName }}</label>
-        </div>
-        <div style="float: right">
-          <a href="#" id="cart" v-on:click="viewCart()"
-            ><i class="fa fa-shopping-cart"></i> My Orders
-            <span class="badge">{{ count }}</span></a
-          >
-        </div>
-      </div>
-    </div>
-    <div>
-      <div
-        v-if="cartViewFlag"
-        class="container stack-top"
-        style="position: absolute"
-      >
-        <div
-          class="shopping-cart"
-          style="float: right; background: black; color: white"
-        >
-          <div class="shopping-cart-header">
-            <i class="fa fa-shopping-cart cart-icon"></i
-            ><span class="badge"
-              ><b>{{ count }}</b></span
+    <div class="fixed_header">
+      <div class="row">
+        <div class="col-lg-12">
+          <div style="float: left">
+            <label
+              ><i class="fa fa-arrow-left" style="padding-left: 4px"></i>
+              {{ resturentName }}</label
             >
-            <div class="shopping-cart-total">
-              <span class="lighter-text-white"><b>Total:</b></span>
-              <span class="main-color-text-white"
-                ><b>{{ total }}</b></span
-              >
-            </div>
           </div>
-
-          <ul
-            v-for="data in cartedList"
-            v-bind:key="data.dish.dish_id"
-            class="shopping-cart-items"
+          <div style="float: right">
+            <a href="#" id="cart" v-on:click="viewCart()"
+              ><i class="fa fa-shopping-cart"></i> My Orders
+              <span class="badge">{{ count }}</span></a
+            >
+          </div>
+        </div>
+      </div>
+      <div>
+        <div
+          v-if="cartViewFlag"
+          class="container stack-top"
+          style="position: absolute"
+        >
+          <div
+            class="shopping-cart"
+            style="float: right; background: black; color: white"
           >
-            <li class="clearfix">
-              <img
-                :src="data.dish.dish_image"
-                alt="item1"
-                style="height: 30px; width: 30px !important"
-              />
-              <span class="item-name">{{ data.dish.dish_name }}</span>
-              <span class="item-price"
-                >( {{ calcuateIndividual(data) }} {{ data.dish.dish_currency }})
-              </span>
-              <span class="item-quantity">{{ data.dish.qty }}</span>
-            </li>
-          </ul>
+            <div class="shopping-cart-header">
+              <i class="fa fa-shopping-cart cart-icon"></i
+              ><span class="badge"
+                ><b>{{ count }}</b></span
+              >
+              <div class="shopping-cart-total">
+                <span class="lighter-text-white"><b>Total:</b></span>
+                <span class="main-color-text-white"
+                  ><b>{{ total }}</b></span
+                >
+              </div>
+            </div>
+
+            <ul
+              v-for="data in cartedList"
+              v-bind:key="data.dish.dish_id"
+              class="shopping-cart-items"
+            >
+              <li class="clearfix">
+                <img
+                  :src="data.dish.dish_image"
+                  alt="item1"
+                  style="height: 30px; width: 30px !important"
+                />
+                <span class="item-name">{{ data.dish.dish_name }}</span>
+                <span class="item-price"
+                  >( {{ calcuateIndividual(data) }}
+                  {{ data.dish.dish_currency }})
+                </span>
+                <span class="item-quantity badge"
+                  ><b>{{ data.qty }}</b></span
+                >
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-
     <div
-      class="scrollmenu"
+      class="scroll"
       style="
         overflow-x: hiddden;
-        overflow: hiddden !important;
+        overflow: scroll;
         background: white;
         font-color: black;
         padding: 4px;
       "
     >
-      <a
-        v-for="(data, index) in menuList"
-        v-bind:key="data.menu_category_id"
-        v-on:click="(active = index), viewDidhesList(data)"
-        :class="{ active: index === active }"
-        style="padding: 5px"
-      >
-        {{ data.menu_category }}</a
-      >
+      <div v-if="menuList.length > 0">
+        <a
+          v-for="(data, index) in menuList"
+          :key="data.menu_category_id"
+          v-on:click="(activeIndex = index), viewDidhesList(data)"
+          :class="{
+            activeData: index === activeIndex,
+          }"
+          style="padding: 5px"
+        >
+          {{ data.menu_category }}</a
+        >
+      </div>
     </div>
 
     <div class="row">
       <div
-        class="col-lg-4 col-sm-8 col-md-6"
+        class="col-lg-3-md-4-sm-5-xs-6"
         v-for="data in dishesList"
         v-bind:key="data.dish_id"
       >
@@ -91,7 +102,19 @@
           <div class="row">
             <div class="col" style="max-width: 300px">
               <div class="row" style="max-width: 200px">
-                <label>
+                <div class="rectangles">
+                  <div class="rectangle">
+                    <div
+                      class="circle"
+                      :class="{
+                        green_1: data.dish_Availability,
+                        red_1: !data.dish_Availability,
+                      }"
+                    ></div>
+                  </div>
+                </div>
+
+                <label style="margin-left: 5px">
                   <b>{{ data.dish_name }}</b></label
                 >
               </div>
@@ -106,7 +129,7 @@
                     >
                   </div>
 
-                  <div style="float: right">
+                  <div style="float: right !important; margin-left: 70px">
                     <label>
                       <b>{{ data.dish_calories }} Calories</b></label
                     >
@@ -147,7 +170,7 @@
                 </div>
               </div>
             </div>
-            <div class="row">
+            <div class="row" style="color: red">
               <p>{{ checkContent(data.addonCat) }}</p>
             </div>
           </div>
@@ -176,12 +199,13 @@ export default {
       total: 0,
       resturentName: "",
       loading: false,
+      activeIndex: 0,
     };
   },
   methods: {
     getDataList() {
       this.loading = true;
-
+      console.log(this.activeIndex + "");
       this.axios
         .get(this.publicUrl, {})
         .then((response) => {
@@ -191,13 +215,14 @@ export default {
             this.menuList = this.dataList[0].table_menu_list;
             this.dishesList = this.dataList[0].table_menu_list;
             this.viewDidhesList(this.dataList[0].table_menu_list[0]);
+            this.activeIndex = -1;
+            console.log(this.activeIndex + "");
           }
+          this.loading = false;
         })
         .catch((error) => {
           console.log(error);
         });
-
-      this.loading = false;
     },
     calcuateIndividual(data) {
       return data.dish.dish_price * data.qty;
@@ -238,7 +263,6 @@ export default {
       } else {
         this.cartedList.push(new_cartInfo);
       }
-      this.count = this.cartedList.length;
       if (window.localStorage) {
         window.localStorage.setItem(
           "cart_items",
@@ -267,7 +291,6 @@ export default {
           JSON.stringify(this.cartedList)
         );
       }
-      this.count = this.cartedList.length;
     },
     displayCartedQty(data) {
       this.cartCheck();
@@ -295,15 +318,17 @@ export default {
           this.cartedList = JSON.parse(localStorage.getItem("cart_items"));
           // console.log("cartedList---------" + JSON.stringify(this.cartedList));
         }
-        this.count = this.cartedList.length;
         this.calculateData();
       }
     },
     calculateData() {
       this.total = 0;
+      var totalCount = 0;
       this.cartedList.forEach((item) => {
         this.total += Number(item.qty) * Number(item.dish.dish_price);
+        totalCount += Number(item.qty);
       });
+      this.count = totalCount;
     },
     checkContent(data) {
       if (data) {
@@ -322,3 +347,94 @@ export default {
   },
 };
 </script>
+
+<style>
+.scroll {
+  white-space: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.example-two-header {
+  .logo {
+    width: 25%;
+  }
+  nav {
+    width: 75%;
+  }
+}
+
+.example-three {
+  .logo,
+  nav {
+    width: 100%;
+  }
+
+  .nav-item {
+    color: #f6f7ee;
+  }
+}
+
+header {
+  background: #152637;
+}
+
+.example-one-header,
+.example-two-header {
+  border-radius: 3px;
+}
+
+.example-three-header {
+  border-radius: 3px 3px 0 0;
+}
+
+.example-three nav {
+  background: #727c87;
+  white-space: nowrap;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0 0 3px 3px;
+}
+
+.nav-item {
+  padding: 12px 16px 13px;
+
+  &:not(:last-child) {
+    border-right: 1px solid rgba(#727c87, 0.2);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+header,
+nav {
+  font-size: 0;
+}
+
+.logo,
+.nav-item {
+  font-size: 14px;
+}
+
+.logo,
+.nav-item,
+.vertical-align-middle {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.title {
+  margin: 24px 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #999;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+</style>
